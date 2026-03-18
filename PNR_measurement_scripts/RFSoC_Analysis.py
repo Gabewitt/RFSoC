@@ -12,8 +12,6 @@ import PNR_analysis as pnr_analyzer
 def main():
 
     extract_photon_statistics = False
-    manual_thresholds = [10250, 11780]
-    optimise_thresholds = True
     save_data = True
     save_RAM_data = False
 
@@ -46,8 +44,13 @@ def main():
     if save_data:
         save_dir.mkdir(parents=True, exist_ok=True)
         print("Save directory:", save_dir)
-
-
+        
+    
+    thresholds_path =  "/" + "RFSoC" "/" + "Data" "/" + "calibration" "/" + "20260318" "/" + "1200" "/" + "threshold_calibration_thresholds.csv"
+    thresholds = np.loadtxt(thresholds_path, delimiter=",")
+    
+    N_detected_path = "/" + "RFSoC" "/" + "Data" "/" + "calibration" "/" + "20260318" "/" + "1200" "/" + "calibration_N_detected.csv"
+    N_detected = np.loadtxt(N_detected_path, delimiter=",")
 
 
     HOST = "0.0.0.0"
@@ -69,7 +72,8 @@ def main():
         print("Saved to:", save_path)
     
     if extract_photon_statistics:
-        N_detected_fraction, thresholds, photon_counts_with_zero = pnr_analyzer.get_N_detected_from_max_amplitude_analysis(data, N_detected=N_detected, save_dir=save_dir, filename_prefix="max_amplitude_threshold_search", manual_thresholds=manual_thresholds, threhold_finder=optimise_thresholds )
+        N_detected_fraction, thresholds, photon_counts_with_zero = pnr_analyzer.get_N_detected_from_max_amplitude_analysis(data, N_detected=N_detected, thresholds=thresholds)
+        
         save = pnr_analyzer.save_analysis_results_csv(save_dir, N_detected_fraction, thresholds, photon_counts_with_zero)
 
 

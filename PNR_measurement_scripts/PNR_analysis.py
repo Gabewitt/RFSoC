@@ -130,18 +130,10 @@ def return_fraction_counts(R_detected):
 
 
 
-def get_N_detected_from_max_amplitude_analysis(data, N_detected, save_dir=None, filename_prefix="max_amplitude_threshold_search", manual_thresholds=None, threhold_finder=False):
+def get_N_detected_from_max_amplitude_analysis(data, N_detected, thresholds):
 
     waveforms, max_amplitudes = classify(data)
 
-    if manual_thresholds is not None and threhold_finder == False:
-        thresholds = manual_thresholds
-    else:
-        thresholds = threshold_finder.interactive_find_thresholds(
-            max_amplitudes,
-            save_dir=save_dir,
-            filename_prefix=filename_prefix
-        )
     
 
     photon_numbers = classify_photon_number_max_ampltitude(waveforms, thresholds)
