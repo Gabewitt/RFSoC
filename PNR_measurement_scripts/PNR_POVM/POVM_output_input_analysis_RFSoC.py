@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 import numpy as np
 from POVM_extract_data import *
@@ -75,12 +77,13 @@ def func_opt2(mu, event, reconstructed_input):
 
 
 
-N_detected_path = '/Volumes/RFsoc/ZCU208B/Data/20260313/Matterhorn/gN2a8-10/Pulsed_Laser_Source/1031/Signal_analysis/N_detected_mu_1_fraction.csv'
+# N_detected_path = '/Volumes/RFsoc/ZCU208B/Data/20260313/Matterhorn/gN2a8-10/Pulsed_Laser_Source/1031/Signal_analysis/N_detected_mu_1_fraction.csv'
 
+N_detected_path = Path.home() / "RFSoC" / "Data" / "20260318" / "Matterhorn" / "gN2a8-10" / "Pulsed_Laser_Source" / "mu_3" / "1606" / "Signal_analysis" / "N_detected_fraction.csv"
 N_detected = np.loadtxt(N_detected_path, delimiter=",")
 
 '''mean photon number per pulse'''
-mu_calib = 0.9834312457408315
+mu_calib = 2.9781388015908252
 
 
 # '''Repetition rate of the laser in MHz'''
@@ -140,7 +143,7 @@ if __name__ == "__main__":
     print(mu_fit)
 
 
-    path = '/Volumes/RFsoc/ZCU208B/Data/20260313/Matterhorn/gN2a8-10/Pulsed_Laser_Source/1031/PNR_POVM_analysis/DPS_data/mu_1/'
+    path = Path.home() / "RFSoC" / "Data" / "20260318" / "Matterhorn" / "gN2a8-10" / "Pulsed_Laser_Source" / "mu_3" / "1606" / "Signal_analysis" 
     
 
     os.makedirs(path, exist_ok=True)
@@ -148,7 +151,7 @@ if __name__ == "__main__":
     comment = "log"
     
     
-    file = open(f"{path}OUTPUT_analysis{comment}_{timestr}.txt", "w")
+    file = open(f"{path}/OUTPUT_analysis{comment}_{timestr}.txt", "w")
     
     
     file.write(f"POVM\n{P}\n\n")
@@ -172,11 +175,11 @@ if __name__ == "__main__":
     res = least_squares(func_opt2, mu_0, args = (M, reconstructed_input), verbose = 1, method='trf', ftol=3e-16, xtol=3e-16, gtol=3e-16, max_nfev = 10000)
     mu_fit = "%.2f" % round(float(res.x), 2)
     theoretical_input = poss_stat(res.x, M)
-    saving_folder = path + "Input Analysis" + "/" + "SDE = " + str(eta) + "/" 
+    saving_folder = path / "Input Analysis" / f"SDE = {eta}"
     os.makedirs(saving_folder, exist_ok=True)
     timestr = time.strftime("%Y%m%d-%H%M%S")
     comment = "linear"
-    file = open(f"{saving_folder}Input_analysis{comment}_{timestr}.txt", "w")
+    file = open(f"{saving_folder}/Input_analysis{comment}_{timestr}.txt", "w")
     file.write(f"POVM\n{P}\n\n")
     # file.write(f"STD_POVM\n{STD_POVM}\n\n")
     # file.write(f"Experimental output counts = {QQ_counts}\n")

@@ -1,3 +1,5 @@
+import shutil
+
 import numpy as np
 import receive_data_rfsoc as receiver
 import matplotlib.pyplot as plt
@@ -11,7 +13,7 @@ import PNR_analysis as pnr_analyzer
 
 def main():
 
-    extract_photon_statistics = False
+    extract_photon_statistics = True
     save_data = True
     save_RAM_data = False
 
@@ -22,42 +24,35 @@ def main():
     device_name = "Matterhorn"
     detector_name = "gN2a8-10"
     laser_name = "Pulsed_Laser_Source"
-    mean_photon_number = 2
+    mean_photon_number = 3
     measurement_type = "Signal_analysis"
     N_detected = 0.8260633261176761
 
     
-    save_dir = (
-        Path.home()
-        / "RFSoC"
-        / "Data"
-        / day
-        / device_name
-        / detector_name
-        / laser_name
-        / f"mu_{mean_photon_number}"
-        / s_live
-        / measurement_type
-        
-        )
+    save_dir_data = "/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/" + f"{day}/" 
+    save_dir = "/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/" + f"{day}/N_Detected_Fraction_Calibration_DDRam/" 
 
     if save_data:
         save_dir.mkdir(parents=True, exist_ok=True)
         print("Save directory:", save_dir)
         
     
-    thresholds_path =  "/" + "RFSoC" "/" + "Data" "/" + "calibration" "/" + "20260318" "/" + "1200" "/" + "threshold_calibration_thresholds.csv"
-    thresholds = np.loadtxt(thresholds_path, delimiter=",")
     
-    N_detected_path = "/" + "RFSoC" "/" + "Data" "/" + "calibration" "/" + "20260318" "/" + "1200" "/" + "calibration_N_detected.csv"
+    threshold_path = "/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/" + f"{day}" + "/Threshold_Calibration_DDRam/threshold_calibration.csv"
+    thresholds = np.loadtxt(threshold_path, delimiter=",")
+    print("thresholds:", thresholds)
+    
+    N_detected_path = "/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/" + f"{day}" + "/N_Detected_Fraction_Calibration/N_detected_DPS.csv"
     N_detected = np.loadtxt(N_detected_path, delimiter=",")
+    print("N_detected:", N_detected)
+
 
 
     HOST = "0.0.0.0"
     PORT = 65432
 
     points_per_waveform = 16
-    amount_of_waveforms = 134217728   # total waveforms you expect to receive
+    amount_of_waveforms = 10000000   # total waveforms you expect to receive
 
     data = receiver.receive_data(
         host=HOST,
@@ -67,7 +62,7 @@ def main():
     )
 
     if save_RAM_data:
-        save_path = save_dir / "received_data_RAM.npy"
+        save_path = save_dir_data / "received_data_RAM.npy"
         np.save(save_path, data)
         print("Saved to:", save_path)
     
@@ -77,6 +72,10 @@ def main():
         save = pnr_analyzer.save_analysis_results_csv(save_dir, N_detected_fraction, thresholds, photon_counts_with_zero)
 
 
+    
+    server_path = f"/mnt/qtech-serv1/Projects/RFsoc/ZCU208B/Data/{day}/{device_name}/{detector_name}/{laser_name}/{mean_photon_number}/{s_live[11:13]}{s_live[14:16]}"
+    os.makedirs(server_path, exist_ok=True)
+    shutil.copytree(save_dir_data, server_path, dirs_exist_ok=True)
     return data
 
 

@@ -1,25 +1,26 @@
 import numpy as np
-import receive_data_rfsoc as receiver
+import drivers.receive_data_rfsoc as receiver
 import matplotlib.pyplot as plt
 from pathlib import Path
 import time
 from datetime import datetime
 import os
 
-import find_thresholds as threshold_finder
-import PNR_analysis as pnr_analyzer
+import drivers.find_thresholds as threshold_finder
+import drivers.PNR_analysis as pnr_analyzer
 
 
 HOST = "0.0.0.0"
 PORT = 65432
 points_per_waveform = 16
-amount_of_waveforms = 134217728 
+amount_of_waveforms = 10000000 
 
 now = datetime.now()
 day = now.strftime("%Y%m%d")
 s_live = now.strftime("%H%M")
 
-save_dir = Path.home() / "RFSoC" / "Data" / "calibration" / "thresholds" / f"{day}" / f"{s_live}"
+save_dir = "/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/" + f"{day}" + "/Threshold_Calibration_DDRam/"
+
 save_dir.mkdir(parents=True, exist_ok=True)
 filename_prefix = "threshold_calibration"
 
@@ -43,4 +44,4 @@ thresholds = threshold_finder.interactive_find_thresholds(
             filename_prefix=filename_prefix
         )
 
-np.save(save_dir / f"{filename_prefix}_thresholds.csv", thresholds)
+np.savetxt(save_dir / f"{filename_prefix}.csv", thresholds, delimiter=",")
