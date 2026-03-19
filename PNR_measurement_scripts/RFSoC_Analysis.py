@@ -1,13 +1,16 @@
 import shutil
 
 import numpy as np
-import receive_data_rfsoc as receiver
+import sys
 import matplotlib.pyplot as plt
 from pathlib import Path
 import time
 from datetime import datetime
 import os
 
+sys.path.append("/home/rfsoc/github/RFSoC/PNR_measurement_scripts/drivers")
+
+import receive_data_rfsoc as receiver
 import find_thresholds as threshold_finder
 import PNR_analysis as pnr_analyzer
 
@@ -24,16 +27,16 @@ def main():
     device_name = "Matterhorn"
     detector_name = "gN2a8-10"
     laser_name = "Pulsed_Laser_Source"
-    mean_photon_number = 3
+    mean_photon_number = 0.5
     measurement_type = "Signal_analysis"
-    N_detected = 0.8260633261176761
+    # N_detected = 0.8260633261176761
 
     
     save_dir_data = "/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/" + f"{day}/" 
     save_dir = "/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/" + f"{day}/N_Detected_Fraction_Calibration_DDRam/" 
 
     if save_data:
-        save_dir.mkdir(parents=True, exist_ok=True)
+        os.makedirs(save_dir, exist_ok=True)
         print("Save directory:", save_dir)
         
     
@@ -41,8 +44,10 @@ def main():
     threshold_path = "/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/" + f"{day}" + "/Threshold_Calibration_DDRam/threshold_calibration.csv"
     thresholds = np.loadtxt(threshold_path, delimiter=",")
     print("thresholds:", thresholds)
+
+    #thresholds = thresholds[1:]
     
-    N_detected_path = "/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/" + f"{day}" + "/N_Detected_Fraction_Calibration/N_detected_DPS.csv"
+    N_detected_path = "/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/" + f"{day}" + "/N_Detected_Fraction_Calibration/" + f"mu_{mean_photon_number}" + "/N_detected_DPS.csv"
     N_detected = np.loadtxt(N_detected_path, delimiter=",")
     print("N_detected:", N_detected)
 
@@ -54,15 +59,20 @@ def main():
     points_per_waveform = 16
     amount_of_waveforms = 10000000   # total waveforms you expect to receive
 
-    data = receiver.receive_data(
-        host=HOST,
-        port=PORT,
-        points_per_waveform=points_per_waveform,
-        amount_of_waveforms=amount_of_waveforms
-    )
+    #data = receiver.receive_data(
+        #host=HOST,
+        #port=PORT,
+        #points_per_waveform=points_per_waveform,
+        #amount_of_waveforms=amount_of_waveforms
+    #)
+
+
+    data_dir = f"/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/20260319/received_data_RAM_{mean_photon_number}.npy"
+    data = np.load(data_dir)
+    print("Data loaded from:", data_dir[:10])
 
     if save_RAM_data:
-        save_path = save_dir_data / "received_data_RAM.npy"
+        save_path = save_dir_data + "received_data_RAM.npy"
         np.save(save_path, data)
         print("Saved to:", save_path)
     
@@ -73,7 +83,7 @@ def main():
 
 
     
-    server_path = f"/mnt/qtech-serv1/Projects/RFsoc/ZCU208B/Data/{day}/{device_name}/{detector_name}/{laser_name}/{mean_photon_number}/{s_live[11:13]}{s_live[14:16]}"
+    server_path = f"/mnt/qtech-serv1/RFsoc/ZCU208B/Data/{day}/{device_name}/{detector_name}/{laser_name}/mu_{mean_photon_number}/{s_live[11:13]}{s_live[14:16]}"
     os.makedirs(server_path, exist_ok=True)
     shutil.copytree(save_dir_data, server_path, dirs_exist_ok=True)
     return data

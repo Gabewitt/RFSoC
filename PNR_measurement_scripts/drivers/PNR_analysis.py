@@ -156,8 +156,8 @@ def save_analysis_results_csv(save_dir, N_detected_fraction, thresholds, photon_
     def fmt(x):
         return repr(float(x)) if x != "" else ""
 
-    n_detected_csv_path = save_dir / "N_detected_fraction.csv"
-    combined_csv_path = save_dir / "thresholds_and_photon_counts.csv"
+    n_detected_csv_path = save_dir + "N_detected_fraction.csv"
+    combined_csv_path = save_dir + "thresholds_and_photon_counts.csv"
 
     N_detected_fraction = to_1d_array(N_detected_fraction)
     thresholds = to_1d_array(thresholds)
