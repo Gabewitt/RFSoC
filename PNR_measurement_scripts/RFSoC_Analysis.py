@@ -27,9 +27,10 @@ def main():
     device_name = "Matterhorn"
     detector_name = "gN2a8-10"
     laser_name = "Pulsed_Laser_Source"
-    mean_photon_number = 0.5
+    mean_photon_number = 2
     measurement_type = "Signal_analysis"
     # N_detected = 0.8260633261176761
+    day = 20260319
 
     
     save_dir_data = "/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/" + f"{day}/" 
@@ -50,6 +51,12 @@ def main():
     N_detected_path = "/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/" + f"{day}" + "/N_Detected_Fraction_Calibration/" + f"mu_{mean_photon_number}" + "/N_detected_DPS.csv"
     N_detected = np.loadtxt(N_detected_path, delimiter=",")
     print("N_detected:", N_detected)
+
+    sde = 0.834
+    poisson = np.exp(-mean_photon_number)
+    N_detected = (1 - poisson)*sde
+    N_detected = 1 - np.exp(-mean_photon_number * sde)
+    print("Calculated N_detected:", N_detected)
 
 
 
@@ -82,7 +89,7 @@ def main():
         save = pnr_analyzer.save_analysis_results_csv(save_dir, N_detected_fraction, thresholds, photon_counts_with_zero)
 
 
-    
+    day = now.strftime("%Y%m%d")
     server_path = f"/mnt/qtech-serv1/RFsoc/ZCU208B/Data/{day}/{device_name}/{detector_name}/{laser_name}/mu_{mean_photon_number}/{s_live[11:13]}{s_live[14:16]}"
     os.makedirs(server_path, exist_ok=True)
     shutil.copytree(save_dir_data, server_path, dirs_exist_ok=True)

@@ -116,9 +116,13 @@ def count_photon_numbers(photon_number_distribution):
 
 def calculate_zero_photon_amount(measured_counts, N_detected):
     counts = measured_counts[1:]
+    print("measured_counts[:]", measured_counts[:])
+    print("counts = measured_counts[1:]", counts)
     total_counts = np.sum(measured_counts)
+    print("total_counts:", total_counts)
     zero_photon_count = int((1 - N_detected) * total_counts / N_detected)
     counts = np.insert(counts, 0, zero_photon_count)
+    print("counts with zero photons added:", counts)
     return counts
 
 def return_fraction_counts(R_detected):
