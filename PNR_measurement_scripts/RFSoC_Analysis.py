@@ -18,7 +18,7 @@ def main():
 
     extract_photon_statistics = True
     save_data = True
-    save_RAM_data = False
+
 
     now = datetime.now()
     day = now.strftime("%Y%m%d")
@@ -59,29 +59,10 @@ def main():
     print("Calculated N_detected:", N_detected)
 
 
-
-    HOST = "0.0.0.0"
-    PORT = 65432
-
-    points_per_waveform = 16
-    amount_of_waveforms = 10000000   # total waveforms you expect to receive
-
-    #data = receiver.receive_data(
-        #host=HOST,
-        #port=PORT,
-        #points_per_waveform=points_per_waveform,
-        #amount_of_waveforms=amount_of_waveforms
-    #)
-
-
-    data_dir = f"/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/20260319/received_data_RAM_{mean_photon_number}.npy"
+    data_dir = f"/home/rfsoc/Documents/SNSPD_Lab_Measurements/PNR/RFSoC/Data/{day}/received_data_RAM_{mean_photon_number}.npy"
     data = np.load(data_dir)
     print("Data loaded from:", data_dir[:10])
 
-    if save_RAM_data:
-        save_path = save_dir_data + "received_data_RAM.npy"
-        np.save(save_path, data)
-        print("Saved to:", save_path)
     
     if extract_photon_statistics:
         N_detected_fraction, thresholds, photon_counts_with_zero = pnr_analyzer.get_N_detected_from_max_amplitude_analysis(data, N_detected=N_detected, thresholds=thresholds)
