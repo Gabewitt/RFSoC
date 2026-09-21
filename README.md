@@ -1,6 +1,18 @@
 # This repo holds the analysis code for analyzing and classifying snspd data recorded using the RFSoC using Max amplitude discrimination
 
 
+
+## How to use (I think)
+
+**PNR_measurement_scripts/calibration_scripts/Receive_Data.py** is used to receive the data once in the ram. This saves the data in the raw .npy format.
+
+**PNR_measurement_scripts/calibration_scripts/calibrate_thresholds.py** is used to calibrate the thresholds. Plots the distributions and you insert the thresholds and it reruns until you are satisfied.
+
+**PNR_measurement_scripts_scripts/RFSoC_Analysis.py**, should be the file to run the PNR. Takes in the list of thresholds + data from ram. Loads in the npy file, and the thresholds. It outputs the fraction of each count.
+
+
+
+
 There are three different folders inside this repo that contain specific things.
 
 ### Calibration Scripts
